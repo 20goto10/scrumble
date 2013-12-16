@@ -10,7 +10,11 @@
 <html>
 <style type="text/css">
  .button { border-radius: 3px; -moz-border-radius: 3px; background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
-    background: -moz-linear-gradient(top, #fff, #99f); border: 1px solid #bbb; }
+    background: -moz-linear-gradient(top, #fff, #99f); border: 1px solid #bbb;
+    width:32px; height:32px;
+              background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+              background-repeat:no-repeat;
+              background-position:fixed center }
  .button:active { background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#33c));
     background: -moz-linear-gradient(bottom, #ddf, #99a); }
  </style>
@@ -18,42 +22,29 @@
  <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
 
       <div id='scrumble_controls' style='width:100%;vertical-align:middle;margin:10px; display:none'>
+
         <div id='scrumble_button_container' style='width:100%;height:40px'>
-          <button id='scrumble_button' class='button' style="width:32px; height:32px;
-              background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
-              background-repeat:no-repeat;
-              background-position:fixed center"
-            onclick='shuffle_list_action()'> </button>
+          <button id='scrumble_button' class='button' onclick='shuffle_list_action()'> </button>
         <span style='position:relative;top:-6px'>Randomize Scrum Order</span>
         </div>
 
         <div id='scrumble_start_container' style='width:100%;height:40px'>
-        <button id='scrumble_start' class='button' style="width:32px; height:32px;
-            background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
-            background-repeat:no-repeat;
-            background-position:fixed center"
-          onclick='scrumming_scrum()'> </button>
+        <button id='scrumble_start' class='button' onclick='scrumming_scrum()'> </button>
           <span id='scrumble_start' style='position:relative;top:-6px'>Start Scrum</span>
         </div>
 
         <div id='scrumble_advance_container' style='width:100%;height:40px; display:none'>
-        <button id='scrumble_advance' class='button' style="width:32px; height:32px;
-            background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
-            background-repeat:no-repeat;
-            background-position:fixed center" onclick='advance_speaker()'> </button>
+        <button id='scrumble_advance' class='button' onclick='advance_speaker()'> </button>
           <span id='scrumble_advance_text' style='position:relative;top:-6px'>Next Speaker</span>
         </div>
 
         <div id='scrumble_end_container' style='width:100%;height:40px'>
-        <button id='scrumble_end' class='button' style="width:32px; height:32px;
-            background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
-            background-repeat:no-repeat;
-            background-position:fixed center"
-          onclick='ready_scrum()'> </button>
+        <button id='scrumble_end' class='button' onclick='ready_scrum()'> </button>
           <span id='scrumble_end' style='position:relative;top:-6px'>End Scrum</span>
         </div>
 
-       </div>
+      </div>
+
 <hr/>
        <pre id='scrumble_spoken' style='width:90%;height:2em;color:#8bb;'>
       </pre>
