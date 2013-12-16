@@ -6,58 +6,68 @@
   </ModulePrefs>
   <Content type="html">
     <![CDATA[
-
 <html>
-<style type="text/css">
- .button { border-radius: 3px; -moz-border-radius: 3px; background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
-    background: -moz-linear-gradient(top, #fff, #99f); border: 1px solid #bbb;
-    width:32px; height:32px;
-              background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
-              background-repeat:no-repeat;
-              background-position:fixed center }
- .button:active { background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#33c));
-    background: -moz-linear-gradient(bottom, #ddf, #99a); }
+  <style type="text/css">
+   .button {
+        border-radius: 3px;
+        -moz-border-radius: 3px; background:
+        -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+        background: -moz-linear-gradient(top, #fff, #99f);
+        border: 1px solid #bbb;
+        width:32px;
+        height:32px;
+        background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+        background-repeat:no-repeat;
+        background-position:fixed center
+      }
+   .button:active {
+        background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#33c));
+        background: -moz-linear-gradient(bottom, #ddf, #99a);
+      }
+
+      #scrumble_controls { width:100%;vertical-align:middle;margin:10px; display:none }
+      #scrumble_controls div { width:100%; height:40px; }
+      #scrumble_controls div span { position:relative;top:-6px }
+
+      #scrumble_spoken { width:90%;height:2em;color:#8bb; }
+      #scrumble_unspoken { width:90%;height:2em;color:#f00; }
  </style>
  <body style='background-color:transparent'>
- <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+    <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
 
-      <div id='scrumble_controls' style='width:100%;vertical-align:middle;margin:10px; display:none'>
+    <div id='scrumble_controls'>
 
-        <div id='scrumble_button_container' style='width:100%;height:40px'>
-          <button id='scrumble_button' class='button' onclick='shuffle_list_action()'> </button>
-        <span style='position:relative;top:-6px'>Randomize Scrum Order</span>
-        </div>
+      <div id='scrumble_button_container'>
+        <button id='scrumble_button' class='button' onclick='shuffle_list_action()'> </button>
+        <span style=''>Randomize Scrum Order</span>
+      </div>
 
-        <div id='scrumble_start_container' style='width:100%;height:40px'>
+      <div id='scrumble_start_container'>
         <button id='scrumble_start' class='button' onclick='scrumming_scrum()'> </button>
-          <span id='scrumble_start' style='position:relative;top:-6px'>Start Scrum</span>
-        </div>
+        <span id='scrumble_start'>Start Scrum</span>
+      </div>
 
-        <div id='scrumble_advance_container' style='width:100%;height:40px; display:none'>
+      <div id='scrumble_advance_container'>
         <button id='scrumble_advance' class='button' onclick='advance_speaker()'> </button>
-          <span id='scrumble_advance_text' style='position:relative;top:-6px'>Next Speaker</span>
-        </div>
+        <span id='scrumble_advance_text'>Next Speaker</span>
+      </div>
 
-        <div id='scrumble_end_container' style='width:100%;height:40px'>
+      <div id='scrumble_end_container'>
         <button id='scrumble_end' class='button' onclick='ready_scrum()'> </button>
-          <span id='scrumble_end' style='position:relative;top:-6px'>End Scrum</span>
-        </div>
-
+        <span id='scrumble_end'>End Scrum</span>
       </div>
 
-<hr/>
-       <pre id='scrumble_spoken' style='width:90%;height:2em;color:#8bb;'>
-      </pre>
-<hr />
+      <hr/>
+      <pre id='scrumble_spoken'></pre>
+      <hr />
       NOW AT THE MIC:
-      <pre id='scrumble_unspoken' style='width:90%;height:2em;color:#f00;'>
-      </pre>
-      </div>
+      <pre id='scrumble_unspoken'></pre>
+    </div>
 
-        <script type="text/javascript" src="//www.google.com/jsapi"></script>
-        <script type="text/javascript">google.load("jquery", "1.3.2");</script>
-        <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
-        <script>
+    <script type="text/javascript" src="//www.google.com/jsapi"></script>
+    <script type="text/javascript">google.load("jquery", "1.3.2");</script>
+    <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+    <script>
 
         READY_STATE = 'ready';
         SCRUMMING_STATE = 'scrumming';
@@ -231,30 +241,30 @@
         }
 
         gapi.hangout.onApiReady.add(function(eventObj) {
-              gapi.hangout.onParticipantsAdded.add(function (event) {
-                    update_participants();
-                    update_scrum_list();
-              });
+            gapi.hangout.onParticipantsAdded.add(function (event) {
+                  update_participants();
+                  update_scrum_list();
+            });
 
-              gapi.hangout.data.onStateChanged.add(function (event ) {
+            gapi.hangout.data.onStateChanged.add(function (event ) {
 
-                 update_scrum_list();
+               update_scrum_list();
 
-              });
+            });
 
-              init();
-              update_participants();
-              update_scrum_list();
+            init();
+            update_participants();
+            update_scrum_list();
 
-              $('#scrumble_controls').show();
+            $('#scrumble_controls').show();
         });
 
 // TODO: what if a user drops out of the scrum
 // TODO: when a user joins after the scrum has started
 
-      </script>
-      </body>
-      </html>
+    </script>
+  </body>
+</html>
     ]]>
   </Content>
 </Module>
