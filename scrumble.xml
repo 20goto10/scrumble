@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="Scrumble" width="200" height="200">
+    <Require feature="rpc"/>
+    <Require feature="views"/>
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+
+<html>
+<style type="text/css">
+ .button { border-radius: 3px; -moz-border-radius: 3px; background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+    background: -moz-linear-gradient(top, #fff, #99f); border: 1px solid #bbb; }
+ .button:active { background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#33c));
+    background: -moz-linear-gradient(bottom, #ddf, #99a); }
+ </style>
+ <body style='background-color:transparent'>
+ <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+
+      <div id='scrumble_controls' style='width:100%;vertical-align:middle;margin:10px; display:none'>
+        <div id='scrumble_button_container' style='width:100%;height:40px'>
+          <button id='scrumble_button' class='button' style="width:32px; height:32px;
+              background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+              background-repeat:no-repeat;
+              background-position:fixed center"
+            onclick='shuffle_list_action()'> </button>
+        <span style='position:relative;top:-6px'>Randomize Scrum Order</span>
+        </div>
+
+        <div id='scrumble_start_container' style='width:100%;height:40px'>
+        <button id='scrumble_start' class='button' style="width:32px; height:32px;
+            background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+            background-repeat:no-repeat;
+            background-position:fixed center"
+          onclick='scrumming_scrum()'> </button>
+          <span id='scrumble_start' style='position:relative;top:-6px'>Start Scrum</span>
+        </div>
+
+        <div id='scrumble_advance_container' style='width:100%;height:40px; display:none'>
+        <button id='scrumble_advance' class='button' style="width:32px; height:32px;
+            background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+            background-repeat:no-repeat;
+            background-position:fixed center" onclick='advance_speaker()'> </button>
+          <span id='scrumble_advance_text' style='position:relative;top:-6px'>Next Speaker</span>
+        </div>
+
+        <div id='scrumble_end_container' style='width:100%;height:40px'>
+        <button id='scrumble_end' class='button' style="width:32px; height:32px;
+            background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+            background-repeat:no-repeat;
+            background-position:fixed center"
+          onclick='ready_scrum()'> </button>
+          <span id='scrumble_end' style='position:relative;top:-6px'>End Scrum</span>
+        </div>
+
+       </div>
+<hr/>
+       <pre id='scrumble_spoken' style='width:90%;height:2em;color:#8bb;'>
+      </pre>
+<hr />
+      NOW AT THE MIC:
+      <pre id='scrumble_unspoken' style='width:90%;height:2em;color:#f00;'>
+      </pre>
+      </div>
+
+        <script type="text/javascript" src="//www.google.com/jsapi"></script>
+        <script type="text/javascript">google.load("jquery", "1.3.2");</script>
+        <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+        <script>
+
+        READY_STATE = 'ready';
+        SCRUMMING_STATE = 'scrumming';
+
+        var participants = [];
+        var names = [];
+        var scrum_order = [];
+        var local_mode = READY_STATE;
+        var previous_local_mode = SCRUMMING_STATE;
+        var scrum_happening = false;
+        var index = 0;
+
+        function shuffle(o){
+            for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+            return o;
+        };
+
+        function update_participants()
+        {
+            participants = gapi.hangout.getParticipants();
+            names = [];
+            for (i = 0; i < participants.length; i++)
+            {
+                names[i] = participants[i].person.displayName;
+                if (!participants[i].person)   // mark the ones who aren't running Scrumble
+                   names[i] += " *";
+            }
+        }
+
+        function shuffle_list_action()
+        {
+            update_participants();
+            scrum_order = shuffle(names);
+            gapi.hangout.data.submitDelta( { 'scrum_order': JSON.stringify(scrum_order) } );
+        }
+
+        function add_participant()  // handle actions on participants added after the scrum begins
+        {
+            // TODO ...
+            // Take new participant and put them randomly into the list of remaining scrummers?
+            // Or just append to the end...
+        }
+
+        function advance_speaker()
+        {
+           index = JSON.parse(gapi.hangout.data.getState()['index']);
+           index++;
+           gapi.hangout.data.setValue( 'index', "'" + index + "'" );
+
+           if (index == scrum_order.length - 1)
+           {
+             $('#scrumble_advance_container').hide();
+           }
+           else
+           if (index >= scrum_order.length)
+           {
+             alert("Scrum Completed, Go Back To Work");
+             ready_scrum();
+           }
+        }
+
+        // STATE distribution functions
+        function update_mode()
+        {
+           local_mode = get_mode();
+           if (local_mode != previous_local_mode)
+           {
+              if (local_mode == SCRUMMING_STATE)
+                 scrumming_local();
+              else if (local_mode == READY_STATE)
+                 ready_local();
+           }
+        }
+
+        function scrumming_scrum()
+        {
+           index = 0;
+           scrumming_local();
+           send_index(index);
+           send_mode(SCRUMMING_STATE);
+        }
+
+        function send_index(ind)
+        {
+           gapi.hangout.data.setValue( 'index', ind);
+        }
+
+        function ready_scrum()
+        {
+           index = 0;
+           ready_local();
+           send_index(0);
+           send_mode(READY_STATE);
+        }
+
+        function scrumming_local()
+        {
+           $('#scrumble_advance_container').show();
+           $('#scrumble_end_container').show();
+           $('#scrumble_button_container').hide();
+           $('#scrumble_start_container').hide();
+
+        }
+
+        function ready_local()
+        {
+           $('#scrumble_advance_container').hide();
+           $('#scrumble_end_container').hide();
+           $('#scrumble_button_container').show();
+           $('#scrumble_start_container').show();
+        }
+
+        function list_display(div_id, start, finish)
+        {
+
+          if (scrum_order.length == 0)
+            scrum_order = names;
+
+          new_data = "";
+          for (var i=start;i<finish;i++)
+           {
+              new_data += scrum_order[i] + "\n";
+           }
+          $(div_id).text(new_data);
+        }
+
+        function update_scrum_list()
+        {
+            update_participants();
+            get_mode();
+            if (index == scrum_order.length - 1)
+              end_scrum_message();
+
+            var name_tmp = gapi.hangout.data.getState()['scrum_order'];
+            if (name_tmp != null)
+              scrum_order = JSON.parse(name_tmp);
+
+            if (index != null && scrum_order != null)
+            {
+              list_display('#scrumble_spoken', 0, index);
+              list_display('#scrumble_unspoken', index, scrum_order.length);
+            }
+        }
+
+        function send_mode(mode)
+        {
+           if (scrum_order.length == 0)
+             scrum_order = names;
+
+           gapi.hangout.data.submitDelta({ 'message': mode, 'scrum_order': JSON.stringify(scrum_order)} );
+        }
+
+        function get_mode()
+        {
+           mode_tmp = gapi.hangout.data.getState();
+           if (mode_tmp['message'] != null)
+             return mode_tmp['message'];
+           else
+             return null;
+        }
+
+        // if no state has been declared, we must be the first user, so push 'ready' state
+        function init()
+        {
+           local_mode = get_mode();
+           if (local_mode == null)
+           {
+             send_mode(READY_STATE);
+             send_index(0);
+           }
+        }
+
+        gapi.hangout.onApiReady.add(function(eventObj) {
+              gapi.hangout.onParticipantsAdded.add(function (event) {
+                    update_participants();
+                    update_scrum_list();
+              });
+
+              gapi.hangout.data.onStateChanged.add(function (event ) {
+
+                 update_scrum_list();
+
+              });
+
+              init();
+              update_participants();
+              update_scrum_list();
+
+              $('#scrumble_controls').show();
+        });
+
+// TODO: what if a user drops out of the scrum
+// TODO: when a user joins after the scrum has started
+
+      </script>
+      </body>
+      </html>
+    ]]>
+  </Content>
+</Module>
+
