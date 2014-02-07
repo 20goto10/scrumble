@@ -25,6 +25,7 @@ ROADMAP
 
 WORKING
 =======
+- "alarm" includes link to Hangout
 - hipchat messaging
 - cookie preservation
 

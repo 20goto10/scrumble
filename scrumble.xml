@@ -16,7 +16,7 @@
         border: 1px solid #bbb;
         width:32px;
         height:32px;
-        background-image:url('http://skullbasher.com/scrumble/pulpo_32x32.png');
+        background-image:url('http://skullbasher.com/scrumble/scrumble_32x32.png');
         background-repeat:no-repeat;
         background-position:fixed center
       }
@@ -203,7 +203,8 @@
         }
 
         function scrumble_alarm() {
-           hipchat_ajax("IT'S SCRUMBLE TIME!<br /><img src='" + $('#hipchat_alarm_image').val() + "' />");
+           hangout_url = gapi.hangout.getHangoutUrl();
+           hipchat_ajax("<a href='" + hangout_url + "'>IT'S SCRUMBLE TIME!<br /><img src='" + $('#hipchat_alarm_image').val() + "' /></a>");
         }
 
         function image_thumb() {
