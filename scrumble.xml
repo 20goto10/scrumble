@@ -25,65 +25,202 @@
         background: -moz-linear-gradient(bottom, #ddf, #99a);
       }
 
-      #scrumble_controls { width:100%;vertical-align:middle;margin:10px; display:none }
-      #scrumble_controls div { width:100%; height:40px; }
-      #scrumble_controls div span { position:relative;top:-6px }
+   #scrumble_controls { width:100%;margin:10px; }
+   #scrumble_controls ul { width:100%; list-style-type:none; list-style-position:none; }
+   #scrumble_controls ul li { line-height: 2em; position:relative; left:-40px; }
+   #scrumble_order { width:90%;height:2em;color:#f00; }
 
-      #scrumble_spoken { width:90%;height:2em;color:#8bb; }
-      #scrumble_unspoken { width:90%;height:2em;color:#f00; }
+   #img_thumb { width: 100px; }
+   #ajax_workaround { display: none }
  </style>
  <body style='background-color:transparent'>
     <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
 
     <div id='scrumble_controls'>
-
-      <div id='scrumble_button_container'>
-        <button id='scrumble_button' class='button' onclick='shuffle_list_action()'> </button>
-        <span style=''>Randomize Scrum Order</span>
-      </div>
-
-      <div id='scrumble_start_container'>
-        <button id='scrumble_start' class='button' onclick='scrumming_scrum()'> </button>
-        <span id='scrumble_start'>Start Scrum</span>
-      </div>
-
-      <div id='scrumble_advance_container'>
-        <button id='scrumble_advance' class='button' onclick='advance_speaker()'> </button>
-        <span id='scrumble_advance_text'>Next Speaker</span>
-      </div>
-
-      <div id='scrumble_end_container'>
-        <button id='scrumble_end' class='button' onclick='ready_scrum()'> </button>
-        <span id='scrumble_end'>End Scrum</span>
-      </div>
-
-      <hr/>
-      <pre id='scrumble_spoken'></pre>
-      <hr />
-      NOW AT THE MIC:
-      <pre id='scrumble_unspoken'></pre>
+      <ul id='scrumble_button_container'>
+        <li><button id='scrumble_button' class='button' onclick='scrumble_alarm()'> </button> Sound the Scrumble Alarm</li>
+        <li><button id='scrumble_button' class='button' onclick='shuffle_list_action()'> </button> Randomize Scrum Order</li>
+        <li><button id='hipchat_msg' class='button' onclick='send_to_hipchat()'> </button>Send Roster to Hipchat</li>
+        <li><input type='text' id='hipchat_key' /> Hipchat Key</li>
+        <li><input type='text' id='hipchat_room' /> Hipchat Room</li>
+        <li><input type='text' id='hipchat_alarm_image' value='' onchange='image_thumb()' /> Alarm URL</li>
+        <li><img id='img_thumb' src='' /> (thumb)</li>
+      </ul>
     </div>
+      <hr />
+      PARTICIPANTS: <br />
+      <pre id='scrumble_participants'></pre>
+      <hr />
+      SCRUM ORDER: <br />
+      <pre id='scrumble_order'></pre>
+      <iframe id='ajax_workaround' >hello</iframe>
 
     <script type="text/javascript" src="//www.google.com/jsapi"></script>
     <script type="text/javascript">google.load("jquery", "1.3.2");</script>
     <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
-    <script>
+    <script type="text/javascript">
+    /*!
+ * jQuery Cookie Plugin v1.4.0
+ * https://github.com/carhartl/jquery-cookie
+ *
+ * Copyright 2013 Klaus Hartl
+ * Released under the MIT license
+ */
+(function (factory) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as anonymous module.
+		define(['jquery'], factory);
+	} else {
+		// Browser globals.
+		factory(jQuery);
+	}
+}(function ($) {
 
-        READY_STATE = 'ready';
-        SCRUMMING_STATE = 'scrumming';
+	var pluses = /\+/g;
+
+	function encode(s) {
+		return config.raw ? s : encodeURIComponent(s);
+	}
+
+	function decode(s) {
+		return config.raw ? s : decodeURIComponent(s);
+	}
+
+	function stringifyCookieValue(value) {
+		return encode(config.json ? JSON.stringify(value) : String(value));
+	}
+
+	function parseCookieValue(s) {
+		if (s.indexOf('"') === 0) {
+			// This is a quoted cookie as according to RFC2068, unescape...
+			s = s.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+		}
+
+		try {
+			// Replace server-side written pluses with spaces.
+			// If we can't decode the cookie, ignore it, it's unusable.
+			// If we can't parse the cookie, ignore it, it's unusable.
+			s = decodeURIComponent(s.replace(pluses, ' '));
+			return config.json ? JSON.parse(s) : s;
+		} catch(e) {}
+	}
+
+	function read(s, converter) {
+		var value = config.raw ? s : parseCookieValue(s);
+		return $.isFunction(converter) ? converter(value) : value;
+	}
+
+	var config = $.cookie = function (key, value, options) {
+
+		// Write
+
+		if (value !== undefined && !$.isFunction(value)) {
+			options = $.extend({}, config.defaults, options);
+
+			if (typeof options.expires === 'number') {
+				var days = options.expires, t = options.expires = new Date();
+				t.setTime(+t + days * 864e+5);
+			}
+
+			return (document.cookie = [
+				encode(key), '=', stringifyCookieValue(value),
+				options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+				options.path    ? '; path=' + options.path : '',
+				options.domain  ? '; domain=' + options.domain : '',
+				options.secure  ? '; secure' : ''
+			].join(''));
+		}
+
+		// Read
+
+		var result = key ? undefined : {};
+
+		// To prevent the for loop in the first place assign an empty array
+		// in case there are no cookies at all. Also prevents odd result when
+		// calling $.cookie().
+		var cookies = document.cookie ? document.cookie.split('; ') : [];
+
+		for (var i = 0, l = cookies.length; i < l; i++) {
+			var parts = cookies[i].split('=');
+			var name = decode(parts.shift());
+			var cookie = parts.join('=');
+
+			if (key && key === name) {
+				// If second argument (value) is a function it's a converter...
+				result = read(cookie, value);
+				break;
+			}
+
+			// Prevent storing a cookie that we couldn't decode.
+			if (!key && (cookie = read(cookie)) !== undefined) {
+				result[name] = cookie;
+			}
+		}
+
+		return result;
+	};
+
+	config.defaults = {};
+
+	$.removeCookie = function (key, options) {
+		if ($.cookie(key) === undefined) {
+			return false;
+		}
+
+		// Must not alter options, thus extending a fresh object...
+		$.cookie(key, '', $.extend({}, options, { expires: -1 }));
+		return !$.cookie(key);
+	};
+
+}));
+
+        // SCRUMBLE 2.0
 
         var participants = [];
         var names = [];
         var scrum_order = [];
-        var local_mode = READY_STATE;
-        var previous_local_mode = SCRUMMING_STATE;
-        var scrum_happening = false;
-        var index = 0;
+        var cookie_list = ['hipchat_key','hipchat_room','hipchat_alarm_image'];
+
+        function preserve_cookies()
+        {
+          for (var i=0;i<cookie_list.length;i++)
+            $.cookie(cookie_list[i], $('#' + cookie_list[i]).val(), { expires: 30, secure: true } );
+        }
+
+        function revive_cookies()
+        {
+           for (var i=0;i<cookie_list.length;i++)
+              if ($.cookie(cookie_list[i]))
+                 $('#' + cookie_list[i]).val($.cookie(cookie_list[i]));
+        }
+
+        function hipchat_ajax(message)
+        {
+           preserve_cookies();
+
+           url = "https://api.hipchat.com/v1/rooms/message?format=json&auth_token=" + $('#hipchat_key').val() + "&room_id=" + $('#hipchat_room').val() + "&from=ScrumbleBot&message_format=html&notify=1&color=green&message=" + encodeURIComponent(message);
+           $('#ajax_workaround').attr("src", url);
+        }
+
+        function scrumble_alarm() {
+           hipchat_ajax("IT'S SCRUMBLE TIME!<br /><img src='" + $('#hipchat_alarm_image').val() + "' />");
+        }
+
+        function image_thumb() {
+          $('#img_thumb').attr("src", $('#hipchat_alarm_image').val());
+        }
+
+        function send_to_hipchat() {
+          if (scrum_order.length != participants.length)
+            shuffle_list_action();
+
+          hipchat_ajax("SCRUM ORDER:<br />" + scrum_order.join("<br />"));
+        }
 
         function shuffle(o){
             for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
             return o;
-        };
+        }
 
         function update_participants()
         {
@@ -92,175 +229,27 @@
             for (i = 0; i < participants.length; i++)
             {
                 names[i] = participants[i].person.displayName;
-                if (!participants[i].person)   // mark the ones who aren't running Scrumble
-                   names[i] += " *";
             }
+            $('#scrumble_participants').html(names.join("\n"));
         }
 
         function shuffle_list_action()
         {
             update_participants();
             scrum_order = shuffle(names);
-            gapi.hangout.data.submitDelta( { 'scrum_order': JSON.stringify(scrum_order) } );
-        }
-
-        function add_participant()  // handle actions on participants added after the scrum begins
-        {
-            // TODO ...
-            // Take new participant and put them randomly into the list of remaining scrummers?
-            // Or just append to the end...
-        }
-
-        function advance_speaker()
-        {
-           index = JSON.parse(gapi.hangout.data.getState()['index']);
-           index++;
-           gapi.hangout.data.setValue( 'index', "'" + index + "'" );
-
-           if (index == scrum_order.length - 1)
-           {
-             $('#scrumble_advance_container').hide();
-           }
-           else
-           if (index >= scrum_order.length)
-           {
-             alert("Scrum Completed, Go Back To Work");
-             ready_scrum();
-           }
-        }
-
-        // STATE distribution functions
-        function update_mode()
-        {
-           local_mode = get_mode();
-           if (local_mode != previous_local_mode)
-           {
-              if (local_mode == SCRUMMING_STATE)
-                 scrumming_local();
-              else if (local_mode == READY_STATE)
-                 ready_local();
-           }
-        }
-
-        function scrumming_scrum()
-        {
-           index = 0;
-           scrumming_local();
-           send_index(index);
-           send_mode(SCRUMMING_STATE);
-        }
-
-        function send_index(ind)
-        {
-           gapi.hangout.data.setValue( 'index', ind);
-        }
-
-        function ready_scrum()
-        {
-           index = 0;
-           ready_local();
-           send_index(0);
-           send_mode(READY_STATE);
-        }
-
-        function scrumming_local()
-        {
-           $('#scrumble_advance_container').show();
-           $('#scrumble_end_container').show();
-           $('#scrumble_button_container').hide();
-           $('#scrumble_start_container').hide();
-
-        }
-
-        function ready_local()
-        {
-           $('#scrumble_advance_container').hide();
-           $('#scrumble_end_container').hide();
-           $('#scrumble_button_container').show();
-           $('#scrumble_start_container').show();
-        }
-
-        function list_display(div_id, start, finish)
-        {
-
-          if (scrum_order.length == 0)
-            scrum_order = names;
-
-          new_data = "";
-          for (var i=start;i<finish;i++)
-           {
-              new_data += scrum_order[i] + "\n";
-           }
-          $(div_id).text(new_data);
-        }
-
-        function update_scrum_list()
-        {
-            update_participants();
-            get_mode();
-            if (index == scrum_order.length - 1)
-              end_scrum_message();
-
-            var name_tmp = gapi.hangout.data.getState()['scrum_order'];
-            if (name_tmp != null)
-              scrum_order = JSON.parse(name_tmp);
-
-            if (index != null && scrum_order != null)
-            {
-              list_display('#scrumble_spoken', 0, index);
-              list_display('#scrumble_unspoken', index, scrum_order.length);
-            }
-        }
-
-        function send_mode(mode)
-        {
-           if (scrum_order.length == 0)
-             scrum_order = names;
-
-           gapi.hangout.data.submitDelta({ 'message': mode, 'scrum_order': JSON.stringify(scrum_order)} );
-        }
-
-        function get_mode()
-        {
-           mode_tmp = gapi.hangout.data.getState();
-           if (mode_tmp['message'] != null)
-             return mode_tmp['message'];
-           else
-             return null;
-        }
-
-        // if no state has been declared, we must be the first user, so push 'ready' state
-        function init()
-        {
-           local_mode = get_mode();
-           if (local_mode == null)
-           {
-             send_mode(READY_STATE);
-             send_index(0);
-           }
+            $('#scrumble_order').text(scrum_order.join("\n"));
         }
 
         gapi.hangout.onApiReady.add(function(eventObj) {
-            gapi.hangout.onParticipantsAdded.add(function (event) {
-                  update_participants();
-                  update_scrum_list();
-            });
-
-            gapi.hangout.data.onStateChanged.add(function (event ) {
-
-               update_scrum_list();
-
-            });
-
-            init();
             update_participants();
-            update_scrum_list();
 
-            $('#scrumble_controls').show();
+            gapi.hangout.onParticipantsAdded.add(function (event) {
+               update_participants();
+            });
+
+            revive_cookies();
+            image_thumb();
         });
-
-// TODO: what if a user drops out of the scrum
-// TODO: when a user joins after the scrum has started
 
     </script>
   </body>

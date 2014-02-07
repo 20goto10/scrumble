@@ -1,24 +1,33 @@
 scrumble
 ========
 
-A simple Google hangout app that randomizes the order of presenters for collaborative teams. 
+A simple Google hangout app that randomize the order of presenters for collaborative teams. It can also send an alarm to remind visitors that it's Scrum Time.
+
+This Hangout plugin relies on having a Hipchat room and a Hipchat API key.
 
 Blahblah
 ========
-More information on creating these apps, including deployment info, is located here:
+
+Believe it or not, there's no Hangout API interface for connecting to
+gchat. 
+
+Scrumble saves your room name, hipchat key, and alarm image as cookies
+so you can retrieve them next to you reload.
+
+More information on creating Hangout apps, including deployment info, is located here:
 https://developers.google.com/+/hangouts/writing
 
 ROADMAP
 =======
-- fix synchronization of Scrum start and advancement
-- handle users who join before/after the scrum
-- better interface
-- feature for someone who doesn't want to/have to speak
-- Once it's working, make available to non-dev public
+- User exclusion list [checkboxes to allow some users to not be listed
+  in the roster]
+- Make available to non-dev public
 
 WORKING
 =======
-- randomization of user list (it is correctly updated on all screens)
+- hipchat messaging
+- cookie preservation
+
 
 
 
