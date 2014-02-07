@@ -40,7 +40,7 @@
       <ul id='scrumble_button_container'>
         <li><button id='scrumble_button' class='button' onclick='scrumble_alarm()'> </button> Sound the Scrumble Alarm</li>
         <li><button id='scrumble_button' class='button' onclick='shuffle_list_action()'> </button> Randomize Scrum Order</li>
-        <li><button id='hipchat_msg' class='button' onclick='send_to_hipchat()'> </button>Send Roster to Hipchat</li>
+        <li><button id='hipchat_msg' class='button' onclick='send_to_hipchat()'> </button> Send Roster to Hipchat</li>
         <li><input type='text' id='hipchat_key' /> Hipchat Key</li>
         <li><input type='text' id='hipchat_room' /> Hipchat Room</li>
         <li><input type='text' id='hipchat_alarm_image' value='' onchange='image_thumb()' /> Alarm URL</li>
