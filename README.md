@@ -48,6 +48,7 @@ ROADMAP
 
 WORKING
 =======
+- save cookies on change to any field
 - "alarm" includes link to Hangout
 - "alarm" image and thumbnail
 - Hipchat messaging
