@@ -41,6 +41,7 @@ ROADMAP
 =======
 - User exclusion list [checkboxes to allow some users to not be listed
   in the roster, or always be first]
+- handler for users who join late (append their names to the listed Scrumble users and auto-send to Hipchat?)
 - Manual user reordering and save?
 - Make available to non-dev public as an "official" Google app
 - suggestions welcome!
