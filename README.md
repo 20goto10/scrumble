@@ -44,6 +44,7 @@ ROADMAP
 - handler for users who join late (append their names to the listed Scrumble users and auto-send to Hipchat?)
 - Manual user reordering and save?
 - Make available to non-dev public as an "official" Google app
+- share the scrum order and make the first Scrumble user the "leader"
 - suggestions welcome!
 
 WORKING
