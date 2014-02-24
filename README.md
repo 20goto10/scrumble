@@ -46,6 +46,7 @@ ROADMAP
 - control of alarm text
 - remember previous users instead of using current participant list
 - Manual user reordering and save?
+- Share ordered list to other users of Scrumble
 - Make available to non-dev public as an "official" Google app
 - share the scrum order and make the first Scrumble user the "leader"
 - suggestions welcome!
