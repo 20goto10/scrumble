@@ -49,10 +49,11 @@
     </div>
       <hr />
       PARTICIPANTS: <br />
-      <pre id='scrumble_participants'></pre>
+      <div id='scrumble_participants'></div>
       <hr />
       SCRUM ORDER: <br />
       <pre id='scrumble_order'></pre>
+      <input type='hidden' id='scrumble_exclusions' value='' />
       <iframe id='ajax_workaround' >hello</iframe>
 
     <script type="text/javascript" src="//www.google.com/jsapi"></script>
@@ -173,13 +174,13 @@
 	};
 
 }));
-
         // SCRUMBLE 2.0
 
         var participants = [];
         var names = [];
         var scrum_order = [];
-        var cookie_list = ['hipchat_key','hipchat_room','hipchat_alarm_image'];
+        var excluded_list = [];
+        var cookie_list = ['hipchat_key','hipchat_room','hipchat_alarm_image','scrumble_exclusions'];
 
         function preserve_cookies()
         {
@@ -191,7 +192,11 @@
         {
            for (var i=0;i<cookie_list.length;i++)
               if ($.cookie(cookie_list[i]))
-                 $('#' + cookie_list[i]).val($.cookie(cookie_list[i]));
+              {
+                 if ($.cookie(cookie_list[i]) != null)
+                    $('#' + cookie_list[i]).val($.cookie(cookie_list[i])); // restore text input fields
+//                  alert($('#' + cookie_list[i]).val());
+              }
         }
 
         function hipchat_ajax(message)
@@ -212,10 +217,13 @@
         }
 
         function send_to_hipchat() {
-          if (scrum_order.length != participants.length)
-            shuffle_list_action();
-
-          hipchat_ajax("SCRUM ORDER:<br />" + scrum_order.join("<br />"));
+          if (scrum_order.length == 0 || scrum_order.length != names.diff(excluded_participants()).length)
+          {
+            if (shuffle_list_action())
+              hipchat_ajax("SCRUM ORDER:<br />" + scrum_order.join("<br />"));
+          }
+          else
+              hipchat_ajax("SCRUM ORDER:<br />" + scrum_order.join("<br />"));
         }
 
         function shuffle(o){
@@ -223,32 +231,77 @@
             return o;
         }
 
+        function update_exclusions()
+        {
+          var i = 0;
+          excluded_list = [];
+
+          $(".exclusions").each(function() {
+             if (!$(this).is(':checked'))
+             {
+               excluded_list[i] = $(this).attr('name');
+               i++;
+             }
+          });
+          $('#scrumble_exclusions').val(JSON.stringify(excluded_list));
+
+          preserve_cookies();
+        }
+
+        function excluded_participants()
+        {
+            t_exc = $('#scrumble_exclusions').val();
+            var exclusions = [];
+            if (t_exc != '')
+              exclusions = JSON.parse($('#scrumble_exclusions').val());
+            return exclusions;
+        }
+
+        Array.prototype.diff = function(a) {
+            return this.filter(function(i) {return a.indexOf(i) < 0;});
+        };
+
         function update_participants()
         {
-            participants = gapi.hangout.getParticipants();
+            var participants = gapi.hangout.getParticipants();
             names = [];
-            for (i = 0; i < participants.length; i++)
+            visible = [];
+            var excluded_names = excluded_participants();
+
+            for (var i = 0; i < participants.length; i++)
             {
                 names[i] = participants[i].person.displayName;
+                visible[i] = names[i] + " <input type='checkbox' " +  (excluded_names.indexOf(names[i]) != -1 ? "" : "checked") + " class='exclusions' name=\"" + names[i] + "\" onchange='update_exclusions()' />";
             }
-            $('#scrumble_participants').html(names.join("\n"));
+            $('#scrumble_participants').html(visible.join("<br />"));
         }
 
         function shuffle_list_action()
         {
             update_participants();
-            scrum_order = shuffle(names);
-            $('#scrumble_order').text(scrum_order.join("\n"));
+            $('#scrumble_order').text('');
+            scrum_order = shuffle(names.diff(excluded_participants()));
+            if (scrum_order.length > 0)
+            {
+              $('#scrumble_order').text(scrum_order.join("\n"));
+              return true;
+            }
+            else
+            {
+              alert('No eligible participants!');
+              return false;
+            }
         }
 
         gapi.hangout.onApiReady.add(function(eventObj) {
+            revive_cookies();
+
             update_participants();
 
             gapi.hangout.onParticipantsAdded.add(function (event) {
                update_participants();
             });
 
-            revive_cookies();
             image_thumb();
         });
 
