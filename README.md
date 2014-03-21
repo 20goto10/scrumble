@@ -58,3 +58,4 @@ WORKING
 - cookie preservation
 - user randomization
 - User exclusion list [checkboxes allow some users to not be included in the randomizer]
+- custom alarm message

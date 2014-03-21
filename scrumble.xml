@@ -43,7 +43,8 @@
         <li><button id='hipchat_msg' class='button' onclick='send_to_hipchat()'> </button> Send Roster to Hipchat</li>
         <li><input type='text' id='hipchat_key' onchange='preserve_cookies()' /> Hipchat Key</li>
         <li><input type='text' id='hipchat_room' onchange='preserve_cookies()' /> Hipchat Room</li>
-        <li><input type='text' id='hipchat_alarm_image' onchange='preserve_cookies()' value='' onchange='image_thumb()' /> Alarm URL</li>
+        <li><input type='text' id='hipchat_alarm_message' onchange='preserve_cookies()' value='' onchange='preserve_cookies()' /> Alarm Message</li>
+        <li><input type='text' id='hipchat_alarm_image' onchange='preserve_cookies()' value='' onchange='image_thumb()' /> Alarm IMG URL</li>
         <li><img id='img_thumb' src='' /> (thumb)</li>
       </ul>
     </div>
@@ -180,7 +181,7 @@
         var names = [];
         var scrum_order = [];
         var excluded_list = [];
-        var cookie_list = ['hipchat_key','hipchat_room','hipchat_alarm_image','scrumble_exclusions'];
+        var cookie_list = ['hipchat_key','hipchat_room','hipchat_alarm_image', 'hipchat_alarm_message', 'scrumble_exclusions'];
 
         function preserve_cookies()
         {
@@ -197,6 +198,8 @@
                     $('#' + cookie_list[i]).val($.cookie(cookie_list[i])); // restore text input fields
 //                  alert($('#' + cookie_list[i]).val());
               }
+           if ($('#hipchat_alarm_message').val() == '')
+             $('#hipchat_alarm_message').val("IT'S SCRUMBLE TIME!");
         }
 
         function hipchat_ajax(message)
@@ -209,7 +212,7 @@
 
         function scrumble_alarm() {
            hangout_url = gapi.hangout.getHangoutUrl();
-           hipchat_ajax("<a href='" + hangout_url + "'>IT'S SCRUMBLE TIME!<br /><img src='" + $('#hipchat_alarm_image').val() + "' /></a>");
+           hipchat_ajax("<a href='" + hangout_url + "'>" + $('#hipchat_alarm_message').val() + "<br /><img src='" + $('#hipchat_alarm_image').val() + "' /></a>");
         }
 
         function image_thumb() {
@@ -271,7 +274,7 @@
             for (var i = 0; i < participants.length; i++)
             {
                 names[i] = participants[i].person.displayName;
-                visible[i] = names[i] + " <input type='checkbox' " +  (excluded_names.indexOf(names[i]) != -1 ? "" : "checked") + " class='exclusions' name=\"" + names[i] + "\" onchange='update_exclusions()' />";
+                visible[i] = "<input type='checkbox' " +  (excluded_names.indexOf(names[i]) != -1 ? "" : "checked") + " class='exclusions' name=\"" + names[i] + "\" onchange='update_exclusions()' /> " + names[i];
             }
             $('#scrumble_participants').html(visible.join("<br />"));
         }
