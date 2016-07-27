@@ -16,7 +16,7 @@
         border: 1px solid #bbb;
         width:32px;
         height:32px;
-        background-image:url('http://skullbasher.com/scrumble/scrumble_32x32.png');
+        background-image:url('https://raw.githubusercontent.com/20goto10/scrumble/master/scrumble_32x32.png');
         background-repeat:no-repeat;
         background-position:fixed center
       }
